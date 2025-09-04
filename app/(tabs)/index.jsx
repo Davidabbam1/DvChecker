@@ -104,7 +104,7 @@ export default function HomeScreen() {
 
         <FontAwesome
           name="power-off"
-          size={26}
+          size={25}
           color={Colors.light.text}
           onPress={() => setShowLogoutModal(true)}
         />
