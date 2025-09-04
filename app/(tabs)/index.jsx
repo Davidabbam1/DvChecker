@@ -1,6 +1,5 @@
 import { FontAwesome, FontAwesome6, Foundation, MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -105,7 +104,7 @@ export default function HomeScreen() {
 
         <FontAwesome
           name="power-off"
-          size={25}
+          size={26}
           color={Colors.light.text}
           onPress={() => setShowLogoutModal(true)}
         />
