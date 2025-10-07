@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "dvreal",
-    "slug": "dvreal",
+    "name": "Dvchecker",
+    "slug": "Dvchecker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/policelogo.png",
@@ -22,7 +22,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/policelogo.png"
     },
     "plugins": [
       "expo-router",

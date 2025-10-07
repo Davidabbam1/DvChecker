@@ -39,14 +39,38 @@ const Carcheck = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={{ flex: 1 }}>
         <View style={{width: "90%", marginHorizontal: "auto", marginTop: 45}}>
-          <TextInput
-            onChangeText={(value)=>{setCarNumber(value)}}
-            placeholder='Enter plate number'
-            placeholderTextColor={'#273576'}
-            style={styles.input}
-          />
+
+        <TextInput
+          value={carNumber}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          autoComplete="off"
+          keyboardType="default"
+          onChangeText={(value) => {
+            let cleaned = value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+            let formatted = "";
+
+            if (cleaned.length <= 2) {
+              formatted = cleaned;
+            } else if (cleaned.length <= 6) {
+              formatted = `${cleaned.slice(0, 2)}-${cleaned.slice(2)}`;
+            } else {
+              formatted = `${cleaned.slice(0, 2)}-${cleaned.slice(2, cleaned.length - 2)}-${cleaned.slice(-2)}`;
+            }
+
+            setCarNumber(formatted);
+          }}
+          placeholder="Enter plate number"
+          placeholderTextColor="#273576"
+          style={styles.input}
+          maxLength={12}
+        />
+
+
+
+
           <Text style={{ width: "90%", marginHorizontal: "auto", color: '#273576', marginBottom: 41 }}>
-            eg. GX 2803 - 21
+            eg. GX-2803-21
           </Text>
           <Text style={{ width: "90%", marginHorizontal: "auto", color: '#273576', marginBottom: 41, fontSize: 18 }}>
             NB. Enter private, commercial and motor

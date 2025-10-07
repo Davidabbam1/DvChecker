@@ -17,7 +17,6 @@ import {
 } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-// ✅ Firebase imports
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase-config";
 
@@ -25,7 +24,7 @@ const Index = () => {
   const [idNumber, setIdNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loggedSuccess, setLoggedSuccess] = useState(true);
-  const [loading, setLoading] = useState(false); // 👈 new state
+  const [loading, setLoading] = useState(false);
 
   const scrollRef = useRef(null);
   const fieldY = useRef({});
@@ -35,14 +34,14 @@ const Index = () => {
 
   async function routeToProfile() {
     try {
-      setLoading(true); // start spinner
+      setLoading(true);
       const email = policeNumberToEmail(idNumber);
       const res = await signInWithEmailAndPassword(auth, email, password);
 
       console.log("Login success:", res.user.uid);
       setLoggedSuccess(true);
 
-      // Optional small delay for smoother transition
+
       setTimeout(() => {
         setLoading(false);
         router.push("/(tabs)");
@@ -51,7 +50,7 @@ const Index = () => {
     } catch (error) {
       console.log("Login error:", error.message);
       setLoggedSuccess(false);
-      setLoading(false); // stop spinner
+      setLoading(false);
     }
   }
 

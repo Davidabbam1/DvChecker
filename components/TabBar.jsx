@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Platform } from 'react-native';
 import { Colors } from "../constants/Colors";
 
 const TabBar = ({ state, descriptors, navigation }) => {
@@ -73,7 +73,7 @@ export default TabBar
 const styles = StyleSheet.create({
     tabBar:{
         position: 'absolute',
-        bottom: 50,
+        bottom: Platform.OS === "ios" ? 50 : 40,
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
