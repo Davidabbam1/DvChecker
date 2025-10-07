@@ -100,7 +100,7 @@ export default function SignUp() {
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
           <ScrollView
             style={{ flex: 1 }}
-            contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 150 }}
+            contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled={true}
             showsVerticalScrollIndicator={false}

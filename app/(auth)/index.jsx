@@ -58,11 +58,13 @@ const Index = () => {
     router.push('/signup');
   }
 
-  const scrollTo = (y) => {
-    if (typeof y === 'number') {
-      scrollRef.current?.scrollTo({ y: Math.max(y - 20, 0), animated: true });
-    }
-  };
+const scrollTo = (y) => {
+  if (typeof y === 'number') {
+    const extraOffset = 50;
+    scrollRef.current?.scrollTo({ y: Math.max(y - extraOffset, 0), animated: true });
+  }
+};
+
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -123,7 +125,7 @@ const Index = () => {
           <ScrollView
             ref={scrollRef}
             style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: Platform.OS == "ios" ? 24 : 220 }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode={Platform.OS === 'ios' ? 'on-drag' : 'interactive'}
             contentInsetAdjustmentBehavior="never"

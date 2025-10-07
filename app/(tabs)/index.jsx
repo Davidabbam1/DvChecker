@@ -96,8 +96,8 @@ export default function HomeScreen() {
        <Pressable onPress={pickImage}>
          <View
            style={{
-             height: 70,
-             width: 70,
+             height: 55,
+             width: 55,
              marginLeft: 15,
              borderRadius: 50,
              alignItems: "center",
