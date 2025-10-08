@@ -6,14 +6,15 @@ import { signOut } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-  Alert,
   Modal,
   Pressable,
   StyleSheet,
   Text,
   View,
   Platform,
+  ActivityIndicator,
 } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { Colors } from "../../constants/Colors";
 import { auth, db } from "../../firebase-config";
 import { getOfficerData } from "../../helpers";
@@ -22,25 +23,50 @@ export default function HomeScreen() {
   const [profilePic, setProfilePic] = useState(require("../../assets/images/user.png"));
   const [officer_data, setOfficerData] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showNetworkModal, setShowNetworkModal] = useState(false); //
 
   useEffect(() => {
-    const loadData = async () => {
-      const data = await getOfficerData(auth.currentUser.email);
-      setOfficerData(data);
+    let unsubscribeNetInfo;
+    let isMounted = true;
 
-      // Load saved photo if exists
-      if (data?.officer_photoURL) {
-        setProfilePic({ uri: data.officer_photoURL });
+    const loadData = async () => {
+      try {
+        const data = await getOfficerData(auth.currentUser.email);
+        if (isMounted) {
+          setOfficerData(data);
+          if (data?.officer_photoURL) {
+            setProfilePic({ uri: data.officer_photoURL });
+          }
+        }
+      } catch (error) {
+        console.log("Error loading officer data:", error.message);
       }
     };
+
+    // Initial fetch
     loadData();
+
+    // Listen for network changes
+    unsubscribeNetInfo = NetInfo.addEventListener((state) => {
+      if (state.isConnected) {
+        console.log("Internet restored, refetching data...");
+        loadData();
+      } else {
+        setShowNetworkModal(true);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      if (unsubscribeNetInfo) unsubscribeNetInfo();
+    };
   }, []);
 
-  // 🔹 Pick Image from Gallery
+  // 🖼 Pick Image from Gallery
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission denied", "Allow gallery access to change your photo.");
+      setShowNetworkModal(true);
       return;
     }
 
@@ -57,14 +83,11 @@ export default function HomeScreen() {
       setProfilePic({ uri: selectedBase64 });
 
       try {
-        // Save the new photo URL (Base64) in Firestore
         await updateDoc(doc(db, "Officers", auth.currentUser.uid), {
           officer_photoURL: selectedBase64,
         });
-        Alert.alert("Success", "Profile picture updated successfully!");
       } catch (error) {
         console.log("Error saving image:", error.message);
-        Alert.alert("Error", "Could not update profile photo.");
       }
     }
   };
@@ -74,13 +97,22 @@ export default function HomeScreen() {
       await signOut(auth);
       router.replace("/(auth)");
     } catch (error) {
-      Alert.alert("Logout failed", error.message);
+      console.log("Logout failed:", error.message);
     }
   };
 
+  if (!officer_data) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#273576" />
+        <Text style={{ marginTop: 10, color: "#273576" }}>Loading data...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={{ marginHorizontal: 25, marginVertical: 25 }}>
-      {/* TOP BAR WITH AVATAR + NAME */}
+      {/* TOP BAR */}
       <View
         style={{
           flexDirection: "row",
@@ -93,46 +125,43 @@ export default function HomeScreen() {
           width: "100%",
         }}
       >
-       <Pressable onPress={pickImage}>
-         <View
-           style={{
-             height: 55,
-             width: 55,
-             marginLeft: 15,
-             borderRadius: 50,
-             alignItems: "center",
-             justifyContent: "center",
-           }}
-         >
-           {/* Profile Image */}
-           <Image
-             source={profilePic}
-             style={{
-               height: 70,
-               width: 70,
-               borderRadius: 50,
-               borderWidth: 3,
-               borderColor: "#273576",
-             }}
-           />
-
-           {/* Edit Icon Overlay */}
-           <View
-             style={{
-               position: "absolute",
-               bottom: 0,
-               right: 0,
-               backgroundColor: "#273576",
-               borderRadius: 20,
-               padding: 3,
-               borderWidth: 1,
-               borderColor: "#fff",
-             }}
-           >
-             <MaterialIcons name="edit" size={12} color="#fff" />
-           </View>
-         </View>
-       </Pressable>
+        <Pressable onPress={pickImage}>
+          <View
+            style={{
+              height: 55,
+              width: 55,
+              marginLeft: 15,
+              borderRadius: 50,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              source={profilePic}
+              style={{
+                height: 70,
+                width: 70,
+                borderRadius: 50,
+                borderWidth: 3,
+                borderColor: "#273576",
+              }}
+            />
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                backgroundColor: "#273576",
+                borderRadius: 20,
+                padding: 3,
+                borderWidth: 1,
+                borderColor: "#fff",
+              }}
+            >
+              <MaterialIcons name="edit" size={12} color="#fff" />
+            </View>
+          </View>
+        </Pressable>
 
         <View style={{ flex: 1, marginRight: 18 }}>
           <Text
@@ -150,7 +179,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* PROFILE HEADER WITH POWER BUTTON */}
+      {/* PROFILE HEADER */}
       <View
         style={{
           flexDirection: "row",
@@ -161,9 +190,7 @@ export default function HomeScreen() {
           marginHorizontal: "auto",
         }}
       >
-        <Text
-          style={{ color: Colors.light.text, fontSize: 22, fontWeight: "bold" }}
-        >
+        <Text style={{ color: Colors.light.text, fontSize: 22, fontWeight: "bold" }}>
           Profile
         </Text>
 
@@ -196,7 +223,7 @@ export default function HomeScreen() {
             alignItems: "flex-start",
           }}
         >
-          {/* Officer Name */}
+          {/* officer info rows */}
           <View style={styles.row}>
             <View style={styles.iconBox}>
               <FontAwesome name="user" size={30} color={Colors.light.text} />
@@ -207,21 +234,13 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          {/* Station */}
           <View style={styles.row}>
             <View style={styles.iconBox}>
-              <FontAwesome6
-                name="location-dot"
-                size={30}
-                color={Colors.light.text}
-              />
+              <FontAwesome6 name="location-dot" size={30} color={Colors.light.text} />
             </View>
-            <Text style={styles.detailText}>
-              {officer_data?.officer_station}
-            </Text>
+            <Text style={styles.detailText}>{officer_data?.officer_station}</Text>
           </View>
 
-          {/* Rank */}
           <View style={styles.row}>
             <View style={styles.iconBox}>
               <MaterialIcons name="grade" size={30} color={Colors.light.text} />
@@ -229,7 +248,6 @@ export default function HomeScreen() {
             <Text style={styles.detailText}>{officer_data?.officer_rank}</Text>
           </View>
 
-          {/* DOB */}
           <View style={styles.row}>
             <View style={styles.iconBox}>
               <Foundation name="calendar" size={30} color={Colors.light.text} />
@@ -237,7 +255,6 @@ export default function HomeScreen() {
             <Text style={styles.detailText}>{officer_data?.officer_dob}</Text>
           </View>
 
-          {/* Email */}
           <View style={styles.row}>
             <View style={styles.iconBox}>
               <Foundation name="mail" size={30} color={Colors.light.text} />
@@ -245,17 +262,37 @@ export default function HomeScreen() {
             <Text style={styles.detailText}>{officer_data?.officer_email}</Text>
           </View>
 
-          {/* Phone */}
           <View style={styles.row}>
             <View style={styles.iconBox}>
               <FontAwesome name="phone" size={30} color={Colors.light.text} />
             </View>
-            <Text style={styles.detailText}>
-              {officer_data?.officer_phoneNumber}
-            </Text>
+            <Text style={styles.detailText}>{officer_data?.officer_phoneNumber}</Text>
           </View>
         </View>
       </View>
+
+      {/* CUSTOM  MODAL */}
+      <Modal
+        transparent
+        visible={showNetworkModal}
+        animationType="fade"
+        onRequestClose={() => setShowNetworkModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>No Internet Connection</Text>
+            <Text style={styles.modalMessage}>
+              You're currently offline. Check your internet connection.
+            </Text>
+            <Pressable
+              style={[styles.button, { backgroundColor: "#273576", marginTop: 10 }]}
+              onPress={() => setShowNetworkModal(false)}
+            >
+              <Text style={styles.buttonText}>OK</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
 
       {/* LOGOUT MODAL */}
       <Modal
@@ -267,21 +304,13 @@ export default function HomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Confirm Logout</Text>
-            <Text style={styles.modalMessage}>
-              Are you sure you want to log out?
-            </Text>
-
+            <Text style={styles.modalMessage}>Are you sure you want to log out?</Text>
             <View style={styles.modalButtons}>
               <Pressable
-                style={[
-                  styles.button,
-                  { backgroundColor: Colors.light.background },
-                ]}
+                style={[styles.button, { backgroundColor: Colors.light.background }]}
                 onPress={() => setShowLogoutModal(false)}
               >
-                <Text
-                  style={[styles.buttonText, { color: Colors.light.text }]}
-                >
+                <Text style={[styles.buttonText, { color: Colors.light.text }]}>
                   Cancel
                 </Text>
               </Pressable>
@@ -304,18 +333,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 23,
-    width: "100%",
-  },
+  row: { flexDirection: "row", alignItems: "center", gap: 23, width: "100%" },
   iconBox: {
     height: 55,
     width: 55,
     backgroundColor: "rgba(39,53,118,0.2)",
     borderRadius: 50,
-    display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -343,6 +366,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     color: Colors.light.text,
+    textAlign: "center",
   },
   modalMessage: {
     fontSize: 16,
@@ -350,19 +374,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: Colors.light.text,
   },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 15,
-  },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  modalButtons: { flexDirection: "row", justifyContent: "space-between", gap: 15 },
+  button: { paddingVertical: 10, paddingHorizontal: 20, borderRadius: 12 },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });

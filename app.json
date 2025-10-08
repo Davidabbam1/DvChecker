@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Dvchecker",
+    "name": "DV Checker",
     "slug": "dvchecker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/dvcheckerlogo.png",
+    "icon": "./assets/images/dvcheckermainlogo.png",
     "scheme": "dvchecker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,7 @@
     "android": {
       "package": "com.anonymous.dvchecker",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/dvcheckerlogo.png",
+        "foregroundImage": "./assets/images/dvcheckermainlogo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
@@ -23,7 +23,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/dvcheckerlogo.png"
+      "favicon": "./assets/images/dvcheckermainlogo.png"
     },
     "plugins": [
       "expo-router",
