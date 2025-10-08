@@ -15,6 +15,8 @@ import {
   View,
 } from "react-native";
 import ModalSelector from "react-native-modal-selector";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../firebase-config";
 
 export default function SignUp() {
@@ -27,30 +29,20 @@ export default function SignUp() {
   const [stationName, setStationName] = useState("");
   const [telephoneNumber, setTelephoneNumber] = useState("");
   const [rank, setRank] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const rankOptions = [
-    { id: 1, label: "Cst." },   // Constable
-    { id: 2, label: "Cpl." },   // Corporal
-    { id: 3, label: "Sgt." },   // Sergeant
-    { id: 4, label: "Insp." },  // Inspector
-    { id: 5, label: "C/Insp." }, // Chief Inspector
-    { id: 6, label: "Supt." },   // Superintendent
-    { id: 7, label: "C/Supt." }, // Chief Superintendent
-    { id: 8, label: "A/Comm." }, // Assistant Commissioner
-    { id: 9, label: "D/Comm." }, // Deputy Commissioner
-    { id: 10, label: "Comm." },  // Commissioner
+    { id: 1, label: "Cst." },
+    { id: 2, label: "Cpl." },
+    { id: 3, label: "Sgt." },
+    { id: 4, label: "Insp." },
+    { id: 5, label: "C/Insp." },
+    { id: 6, label: "Supt." },
+    { id: 7, label: "C/Supt." },
+    { id: 8, label: "A/Comm." },
+    { id: 9, label: "D/Comm." },
+    { id: 10, label: "Comm." },
   ];
-
-  const handleDobChange = (value) => {
-    let cleaned = value.replace(/\D/g, "");
-    if (cleaned.length > 8) cleaned = cleaned.slice(0, 8);
-    let formatted = cleaned;
-    if (cleaned.length > 4 && cleaned.length <= 6)
-      formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
-    else if (cleaned.length > 6)
-      formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6)}`;
-    setDob(formatted);
-  };
 
   const policeNumberToEmail = (policeNumber) => `${policeNumber.trim()}@dv.com`;
 
@@ -119,7 +111,7 @@ export default function SignUp() {
               </Text>
             </View>
 
-            {/* Inputs */}
+            {/* First Name */}
             <TextInput
               placeholder="First name"
               placeholderTextColor={"#273576"}
@@ -127,16 +119,45 @@ export default function SignUp() {
               onChangeText={setFirstName}
             />
 
-            <TextInput
-              placeholder="DOB eg. yyyy-mm-dd"
-              value={dob}
-              onChangeText={handleDobChange}
-              placeholderTextColor={"#273576"}
-              style={styles.input}
-              keyboardType="number-pad"
-              maxLength={10}
-            />
+            {/* DOB with Calendar */}
+            <View style={[styles.input, styles.dateInputContainer]}>
+              <TextInput
+                placeholder="DOB eg. yyyy-mm-dd"
+                value={dob}
+                placeholderTextColor={"#273576"}
+                style={[styles.dateInput]}
+                editable={false}
+              />
+              <Pressable onPress={() => setShowDatePicker(true)}>
+                <Ionicons name="calendar-outline" size={26} color="#273576" />
+              </Pressable>
 
+              {showDatePicker && (
+                <DateTimePicker
+                  value={dob ? new Date(dob) : new Date()}
+                  mode="date"
+                  display="calendar"
+                  onChange={(event, selectedDate) => {
+                    if (event.type === "dismissed") {
+                      // User pressed cancel, just close picker and do nothing
+                      setShowDatePicker(false);
+                      return;
+                    }
+
+                    setShowDatePicker(false);
+                    if (selectedDate) {
+                      const year = selectedDate.getFullYear();
+                      const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+                      const day = String(selectedDate.getDate()).padStart(2, "0");
+                      setDob(`${year}-${month}-${day}`);
+                    }
+                  }}
+                />
+              )}
+
+            </View>
+
+            {/* Last Name */}
             <TextInput
               placeholder="Last name"
               placeholderTextColor={"#273576"}
@@ -144,6 +165,7 @@ export default function SignUp() {
               onChangeText={setLastName}
             />
 
+            {/* Police ID */}
             <TextInput
               placeholder="Police ID No."
               placeholderTextColor={"#273576"}
@@ -154,51 +176,51 @@ export default function SignUp() {
             {/* Rank Selector */}
             <View style={{ marginBottom: 15 }}>
               <ModalSelector
-                  data={rankOptions}
-
-                  keyExtractor={(item) => item.id.toString()}
-                  labelExtractor={(item) => item.label}
-                  initValue="Select Rank"
-                  onChange={(option) => setRank(option.label)}
-                  animationType="fade"
-                  supportedOrientations={['portrait']}
-                  backdropPressToClose={true}
-                  optionContainerStyle={{
-                    backgroundColor: "#fff",
-                    borderRadius: 15,
-                    paddingVertical: 10,
-                    maxHeight: 350,
-                    elevation: 10,
-                  }}
-                  optionTextStyle={{
-                    color: "#273576",
-                    fontSize: 20,
-                    paddingVertical: 10,
-                    textAlign: "left",
-                  }}
-                  scrollViewAccessibilityLabel="Rank options"
-                  overlayStyle={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(0,0,0,0.4)",
-                    justifyContent: "center",
-                    paddingHorizontal: 30,
-                  }}
-                  cancelText=""
-                  cancelContainerStyle={{ display: "none" }}
-                >
-                  <View style={styles.dropdownContainer}>
-                    <Text style={{ color: "#273576", fontSize: 22 }}>
-                      {rank || "Select Rank"}
-                    </Text>
-                    <Text style={{ color: "#273576", fontSize: 18 }}>▼</Text>
-                  </View>
-                </ModalSelector>
+                data={rankOptions}
+                keyExtractor={(item) => item.id.toString()}
+                labelExtractor={(item) => item.label}
+                initValue="Select Rank"
+                onChange={(option) => setRank(option.label)}
+                animationType="fade"
+                supportedOrientations={["portrait"]}
+                backdropPressToClose={true}
+                optionContainerStyle={{
+                  backgroundColor: "#fff",
+                  borderRadius: 15,
+                  paddingVertical: 10,
+                  maxHeight: 350,
+                  elevation: 10,
+                }}
+                optionTextStyle={{
+                  color: "#273576",
+                  fontSize: 20,
+                  paddingVertical: 10,
+                  textAlign: "left",
+                }}
+                scrollViewAccessibilityLabel="Rank options"
+                overlayStyle={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0,0,0,0.4)",
+                  justifyContent: "center",
+                  paddingHorizontal: 30,
+                }}
+                cancelText=""
+                cancelContainerStyle={{ display: "none" }}
+              >
+                <View style={styles.dropdownContainer}>
+                  <Text style={{ color: "#273576", fontSize: 22 }}>
+                    {rank || "Select Rank"}
+                  </Text>
+                  <Text style={{ color: "#273576", fontSize: 18 }}>▼</Text>
+                </View>
+              </ModalSelector>
             </View>
 
+            {/* Station */}
             <TextInput
               placeholder="Station name"
               placeholderTextColor={"#273576"}
@@ -206,6 +228,7 @@ export default function SignUp() {
               onChangeText={setStationName}
             />
 
+            {/* Telephone */}
             <TextInput
               placeholder="Telephone No."
               placeholderTextColor={"#273576"}
@@ -214,6 +237,7 @@ export default function SignUp() {
               onChangeText={setTelephoneNumber}
             />
 
+            {/* Password */}
             <TextInput
               placeholder="Password"
               secureTextEntry
@@ -237,9 +261,7 @@ export default function SignUp() {
                 value={isChecked}
                 onValueChange={setIsChecked}
               />
-              <Text style={{ fontSize: 17 }}>
-                I have provided the correct details
-              </Text>
+              <Text style={{ fontSize: 17 }}>I have provided the correct details</Text>
             </View>
 
             {/* Register Button */}
@@ -284,5 +306,16 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  dateInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 25,
+  },
+  dateInput: {
+    flex: 1,
+    color: "#273576",
+    fontSize: 22,
   },
 };

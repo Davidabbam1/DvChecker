@@ -1,4 +1,4 @@
-package com.anonymous.dvreal
+package com.anonymous.dvchecker
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

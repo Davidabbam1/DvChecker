@@ -1,28 +1,29 @@
 {
   "expo": {
     "name": "Dvchecker",
-    "slug": "Dvchecker",
+    "slug": "dvchecker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/policelogo.png",
-    "scheme": "dvreal",
+    "icon": "./assets/images/dvcheckerlogo.png",
+    "scheme": "dvchecker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.dvchecker"
     },
     "android": {
+      "package": "com.anonymous.dvchecker",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/policelogo.png",
+        "foregroundImage": "./assets/images/dvcheckerlogo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.dvreal"
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/policelogo.png"
+      "favicon": "./assets/images/dvcheckerlogo.png"
     },
     "plugins": [
       "expo-router",

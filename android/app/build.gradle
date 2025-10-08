@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.dvreal'
+    namespace 'com.anonymous.dvchecker'
     defaultConfig {
-        applicationId 'com.anonymous.dvreal'
+        applicationId 'com.anonymous.dvchecker'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,4 +1,4 @@
-package com.anonymous.dvreal
+package com.anonymous.dvchecker
 
 import android.app.Application
 import android.content.res.Configuration
