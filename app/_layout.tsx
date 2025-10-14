@@ -4,6 +4,9 @@ import { Pressable, Text, View } from "react-native";
 import AuthGate from "../components/AuthGate";
 import NetworkBanner from "../components/NetworkBanner";
 
+// This is the main entry point for the application
+
+
 export default function RootLayout() {
   return (
     <AuthGate>

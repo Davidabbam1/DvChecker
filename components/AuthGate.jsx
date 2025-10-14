@@ -12,7 +12,6 @@ export default function AuthGate({ children }) {
    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
 
-      // Check where we are
       const inAuthGroup = segments[0] === "(auth)";
 
       if (!user && !inAuthGroup) {
@@ -27,7 +26,7 @@ export default function AuthGate({ children }) {
     return unsubscribe;
   }, [segments]);
 
-  if (loading) return null; // loader/spinner
+  if (loading) return null;
 
   return children;
 }

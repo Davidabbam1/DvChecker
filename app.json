@@ -4,7 +4,7 @@
     "slug": "dvchecker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/dvcheckermainlogo.png",
+    "icon": "./assets/images/dvfinalicon.png",
     "scheme": "dvchecker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,7 @@
     "android": {
       "package": "com.anonymous.dvchecker",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/dvcheckermainlogo.png",
+        "foregroundImage": "./assets/images/dvfinalicon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
@@ -23,7 +23,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/dvcheckermainlogo.png"
+      "favicon": "./assets/images/dvfinalicon.png"
     },
     "plugins": [
       "expo-router",

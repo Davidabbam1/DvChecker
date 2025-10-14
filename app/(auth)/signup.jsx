@@ -21,6 +21,7 @@ import ModalSelector from "react-native-modal-selector";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../firebase-config";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 LogBox.ignoreLogs([
   'A props object containing a "key" prop is being spread into JSX',
@@ -119,226 +120,235 @@ export default function SignUp() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView
+      edges={["left", "right", "bottom"]}
+      style={{ flex: 1, backgroundColor: "#fff" }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <ScrollView
-          style={{ flex: 1, backgroundColor: "#fff" }}
-          contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 40 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={{ alignItems: "center", marginTop: 40, marginBottom: 30 }}>
-            <Text
-              style={{
-                fontSize: 22,
-                fontWeight: "bold",
-                color: "#273576",
-                marginTop: 25,
-              }}
-            >
-              Create Account
-            </Text>
-          </View>
-
-          {/* First Name */}
-          <TextInput
-            placeholder="First name"
-            placeholderTextColor={"#273576"}
-            style={styles.input}
-            onChangeText={setFirstName}
-          />
-
-          {/* DOB */}
-          <View style={[styles.input, styles.dateInputContainer]}>
-            <TextInput
-              placeholder="DOB eg. yyyy-mm-dd"
-              value={dob}
-              placeholderTextColor={"#273576"}
-              style={styles.dateInput}
-              editable={false}
-            />
-            <Pressable onPress={() => setShowDatePicker(true)}>
-              <Ionicons name="calendar-outline" size={26} color="#273576" />
-            </Pressable>
-
-            {showDatePicker && (
-              <DateTimePicker
-                value={dob ? new Date(dob) : new Date()}
-                mode="date"
-                display="calendar"
-                onChange={(event, selectedDate) => {
-                  if (event.type === "dismissed") {
-                    setShowDatePicker(false);
-                    setDob("");
-                    return;
-                  }
-                  setShowDatePicker(false);
-                  if (selectedDate) {
-                    const year = selectedDate.getFullYear();
-                    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
-                    const day = String(selectedDate.getDate()).padStart(2, "0");
-                    setDob(`${year}-${month}-${day}`);
-                  }
-                }}
-              />
-            )}
-          </View>
-
-          {/* Last Name */}
-          <TextInput
-            placeholder="Last name"
-            placeholderTextColor={"#273576"}
-            style={styles.input}
-            onChangeText={setLastName}
-          />
-
-          {/* Police ID */}
-          <TextInput
-            placeholder="Police ID No."
-            placeholderTextColor={"#273576"}
-            style={styles.input}
-            onChangeText={setId}
-          />
-
-          {/* Rank */}
-          <View style={{ marginBottom: 15 }}>
-            <ModalSelector
-              key="rank-selector"
-              data={rankOptions}
-              initValue="Select Rank"
-              onChange={(option) => setRank(option.label)}
-              animationType="fade"
-              supportedOrientations={["portrait"]}
-              backdropPressToClose
-              optionContainerStyle={{
-                backgroundColor: "#fff",
-                borderRadius: 15,
-                paddingVertical: 10,
-                maxHeight: 350,
-                elevation: 10,
-              }}
-              optionTextStyle={{
-                color: "#273576",
-                fontSize: 20,
-                paddingVertical: 10,
-                textAlign: "left",
-              }}
-              overlayStyle={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.4)",
-                justifyContent: "center",
-                paddingHorizontal: 30,
-              }}
-              cancelText=""
-              cancelContainerStyle={{ display: "none" }}
-            >
-              <View style={styles.dropdownContainer}>
-                <Text style={{ color: "#273576", fontSize: 22 }}>
-                  {rank || "Select Rank"}
-                </Text>
-                <Text style={{ color: "#273576", fontSize: 18 }}>▼</Text>
-              </View>
-            </ModalSelector>
-          </View>
-
-          {/* Station */}
-          <TextInput
-            placeholder="Station name"
-            placeholderTextColor={"#273576"}
-            style={styles.input}
-            onChangeText={setStationName}
-          />
-
-          {/* Telephone */}
-          <TextInput
-            placeholder="Telephone No."
-            placeholderTextColor={"#273576"}
-            style={styles.input}
-            keyboardType="phone-pad"
-            onChangeText={setTelephoneNumber}
-          />
-
-          {/* Password */}
-          <View style={[styles.input, styles.dateInputContainer]}>
-            <TextInput
-              placeholder="Password"
-              secureTextEntry={!showPassword}
-              placeholderTextColor={"#273576"}
-              style={styles.dateInput}
-              onChangeText={setPassword}
-            />
-            <Pressable style={{ padding: 8 }} onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons
-                name={showPassword ? "eye-outline" : "eye-off-outline"}
-                size={26}
-                color="#273576"
-              />
-            </Pressable>
-          </View>
-
-          {/* Switch */}
-          <View
-            style={{
-              marginBottom: 22,
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <Switch
-              trackColor={{ false: "#767577", true: "#273576" }}
-              value={isChecked}
-              onValueChange={setIsChecked}
-            />
-            <Text style={{ fontSize: 17 }}>I have provided the correct details</Text>
-          </View>
-
-          {/* Register Button */}
-          <Pressable
-            onPress={registerOfficer}
-            style={[styles.button, loading && { opacity: 0.7 }]}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={{ color: "white", fontSize: 18 }}>Register</Text>
-            )}
-          </Pressable>
-        </ScrollView>
-      </TouchableWithoutFeedback>
-
-      {/* Alert Modal */}
-      <Modal
-        transparent
-        visible={showAlertModal}
-        animationType="fade"
-        onRequestClose={() => setShowAlertModal(false)}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Ionicons name="alert-circle-outline" size={50} color="#273576" />
-            <Text style={styles.modalTitle}>{alertTitle}</Text>
-            <Text style={styles.modalText}>{alertMessage}</Text>
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => setShowAlertModal(false)}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{
+              paddingHorizontal: 40,
+              paddingBottom: 100,
+              paddingTop: 0,
+            }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header */}
+            <View style={{ alignItems: "center", marginTop: 40, marginBottom: 30 }}>
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontWeight: "bold",
+                  color: "#273576",
+                  marginTop: 25,
+                }}
+              >
+                Create Account
+              </Text>
+            </View>
+
+            {/* First Name */}
+            <TextInput
+              placeholder="First name"
+              placeholderTextColor={"#273576"}
+              style={styles.input}
+              onChangeText={setFirstName}
+            />
+
+            {/* DOB */}
+            <View style={[styles.input, styles.dateInputContainer]}>
+              <TextInput
+                placeholder="DOB eg. yyyy-mm-dd"
+                value={dob}
+                placeholderTextColor={"#273576"}
+                style={styles.dateInput}
+                editable={false}
+              />
+              <Pressable onPress={() => setShowDatePicker(true)}>
+                <Ionicons name="calendar-outline" size={26} color="#273576" />
+              </Pressable>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={dob ? new Date(dob) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    if (event.type === "dismissed") {
+                      setShowDatePicker(false);
+                      setDob("");
+                      return;
+                    }
+                    setShowDatePicker(false);
+                    if (selectedDate) {
+                      const year = selectedDate.getFullYear();
+                      const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+                      const day = String(selectedDate.getDate()).padStart(2, "0");
+                      setDob(`${year}-${month}-${day}`);
+                    }
+                  }}
+                />
+              )}
+            </View>
+
+            {/* Last Name */}
+            <TextInput
+              placeholder="Last name"
+              placeholderTextColor={"#273576"}
+              style={styles.input}
+              onChangeText={setLastName}
+            />
+
+            {/* Police ID */}
+            <TextInput
+              placeholder="Police ID No."
+              placeholderTextColor={"#273576"}
+              style={styles.input}
+              onChangeText={setId}
+            />
+
+            {/* Rank */}
+            <View style={{ marginBottom: 15 }}>
+              <ModalSelector
+                key="rank-selector"
+                data={rankOptions}
+                initValue="Select Rank"
+                onChange={(option) => setRank(option.label)}
+                animationType="fade"
+                supportedOrientations={["portrait"]}
+                backdropPressToClose
+                optionContainerStyle={{
+                  backgroundColor: "#fff",
+                  borderRadius: 15,
+                  paddingVertical: 10,
+                  maxHeight: 350,
+                  elevation: 10,
+                }}
+                optionTextStyle={{
+                  color: "#273576",
+                  fontSize: 20,
+                  paddingVertical: 10,
+                  textAlign: "left",
+                }}
+                overlayStyle={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0,0,0,0.4)",
+                  justifyContent: "center",
+                  paddingHorizontal: 30,
+                }}
+                cancelText=""
+                cancelContainerStyle={{ display: "none" }}
+              >
+                <View style={styles.dropdownContainer}>
+                  <Text style={{ color: "#273576", fontSize: 22 }}>
+                    {rank || "Select Rank"}
+                  </Text>
+                  <Text style={{ color: "#273576", fontSize: 18 }}>▼</Text>
+                </View>
+              </ModalSelector>
+            </View>
+
+            {/* Station */}
+            <TextInput
+              placeholder="Station name"
+              placeholderTextColor={"#273576"}
+              style={styles.input}
+              onChangeText={setStationName}
+            />
+
+            {/* Telephone */}
+            <TextInput
+              placeholder="Telephone No."
+              placeholderTextColor={"#273576"}
+              style={styles.input}
+              keyboardType="phone-pad"
+              onChangeText={setTelephoneNumber}
+            />
+
+            {/* Password */}
+            <View style={[styles.input, styles.dateInputContainer]}>
+              <TextInput
+                placeholder="Password"
+                secureTextEntry={!showPassword}
+                placeholderTextColor={"#273576"}
+                style={styles.dateInput}
+                onChangeText={setPassword}
+              />
+              <Pressable style={{ padding: 8 }} onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons
+                  name={showPassword ? "eye-outline" : "eye-off-outline"}
+                  size={26}
+                  color="#273576"
+                />
+              </Pressable>
+            </View>
+
+            {/* Switch */}
+            <View
+              style={{
+                marginBottom: 22,
+                width: "100%",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 10,
+              }}
             >
-              <Text style={{ color: "white", fontSize: 16 }}>OK</Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#273576" }}
+                value={isChecked}
+                onValueChange={setIsChecked}
+              />
+              <Text style={{ fontSize: 17 }}>I have provided the correct details</Text>
+            </View>
+
+            {/* Register Button */}
+            <Pressable
+              onPress={registerOfficer}
+              style={[styles.button, loading && { opacity: 0.7 }]}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={{ color: "white", fontSize: 18 }}>Register</Text>
+              )}
             </Pressable>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+
+        {/* Alert Modal */}
+        <Modal
+          transparent
+          visible={showAlertModal}
+          animationType="fade"
+          onRequestClose={() => setShowAlertModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Ionicons name="alert-circle-outline" size={50} color="#273576" />
+              <Text style={styles.modalTitle}>{alertTitle}</Text>
+              <Text style={styles.modalText}>{alertMessage}</Text>
+              <Pressable
+                style={styles.modalButton}
+                onPress={() => setShowAlertModal(false)}
+              >
+                <Text style={{ color: "white", fontSize: 16 }}>OK</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </KeyboardAvoidingView>
+        </Modal>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

@@ -59,7 +59,6 @@ const Index = () => {
         setLoading(false);
         router.push("/(tabs)");
 
-        // ✅ Clear inputs *after* navigation
         setIdNumber("");
         setPassword("");
       }, 1500);
@@ -68,7 +67,6 @@ const Index = () => {
       setLoggedSuccess(false);
       setLoading(false);
 
-      // ✅ Clear inputs *after* login failure
       setTimeout(() => {
         setIdNumber("");
         setPassword("");
@@ -80,7 +78,6 @@ const Index = () => {
     // Navigate first
     router.push("/signup");
 
-    // ✅ Then clear fields *after* navigation delay
     setTimeout(() => {
       setIdNumber("");
       setPassword("");
@@ -146,9 +143,10 @@ const Index = () => {
             <Text
               style={{
                 marginBottom: 19,
-                fontSize: 18,
+                fontSize: Platform.OS == "ios" ? 18 : 17,
                 color: "#273576",
                 fontWeight: "600",
+                textAlign:"center"
               }}
             >
               Official Mobile App for Ghana Police Service
